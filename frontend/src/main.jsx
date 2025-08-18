@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Link, NavLink, Navigate } from 'react-rou
 import ScanPage from './pages/ScanPage'
 import DocumentsPage from './pages/DocumentsPage'
 import ChatPage from './pages/ChatPage'
+import VisualizationsPage from './pages/VisualizationsPage'
 
 function AppLayout() {
   return (
@@ -13,6 +14,7 @@ function AppLayout() {
         <NavLink to="/scan">Scan</NavLink>
         <NavLink to="/database">Database</NavLink>
         <NavLink to="/chat">Chat</NavLink>
+        <NavLink to="/visuals">Visualizations</NavLink>
       </nav>
       <div style={{ marginTop: 16 }}>
         <Routes>
@@ -21,6 +23,7 @@ function AppLayout() {
           <Route path="/database" element={<DocumentsPage />} />
           <Route path="/documents" element={<Navigate to="/database" replace />} />
           <Route path="/chat" element={<ChatPage />} />
+          <Route path="/visuals" element={<VisualizationsPage />} />
         </Routes>
       </div>
     </div>
