@@ -25,6 +25,16 @@ npm run dev
 ```
 Vite dev server proxies `/api` to `http://127.0.0.1:8001`.
 
+### Visualizations page
+- After pulling updates, run `npm install` in `frontend/` to fetch new deps (`chart.js`, `react-chartjs-2`).
+- Open `http://localhost:5173/visuals` for database charts:
+  - File types by total size (pie)
+  - Top 5 projects by size (bar)
+  - Top 5 contractors by size (bar)
+  - Top 5 descriptive words from document descriptions (bar)
+  - Files modified per day timeline (bar)
+- Header shows total file count and aggregated size.
+
 ## Environment variables
 Create `.env` in project root:
 ```
