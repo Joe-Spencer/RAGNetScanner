@@ -29,32 +29,35 @@ export default function ChatPage() {
   }
 
   return (
-    <div>
-      <h2>RAG Chat</h2>
-      <form onSubmit={ask} style={{ display: 'grid', gap: 8, gridTemplateColumns: '1fr auto', alignItems: 'center', maxWidth: 900 }}>
-        <input style={{ gridColumn: '1 / span 2' }} placeholder="Ask a question about your data" value={question} onChange={(e) => setQuestion(e.target.value)} />
-        <div style={{ display: 'flex', gap: 8 }}>
-          <input placeholder="Project (optional)" value={project} onChange={(e) => setProject(e.target.value)} />
-          <input placeholder="Contractor (optional)" value={contractor} onChange={(e) => setContractor(e.target.value)} />
-          <input type="number" min={1} max={20} style={{ width: 80 }} title="Top K" value={k} onChange={(e) => setK(Number(e.target.value))} />
-        </div>
-        <button disabled={loading || !question}>{loading ? 'Asking...' : 'Ask'}</button>
-      </form>
-      {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
+    <div className="grid" style={{ gap: 16 }}>
+      <div className="card">
+        <h2 className="title">RAG Chat</h2>
+        <form onSubmit={ask} className="grid" style={{ gap: 10, gridTemplateColumns: '1fr auto' }}>
+          <input style={{ gridColumn: '1 / span 2' }} placeholder="Ask a question about your data" value={question} onChange={(e) => setQuestion(e.target.value)} />
+          <div className="toolbar">
+            <input placeholder="Project (optional)" value={project} onChange={(e) => setProject(e.target.value)} />
+            <input placeholder="Contractor (optional)" value={contractor} onChange={(e) => setContractor(e.target.value)} />
+            <input type="number" min={1} max={20} style={{ width: 120 }} title="Top K" value={k} onChange={(e) => setK(Number(e.target.value))} />
+          </div>
+          <button disabled={loading || !question}>{loading ? 'Asking…' : 'Ask'}</button>
+        </form>
+        {error && <div style={{ color: 'salmon', marginTop: 8 }}>{error}</div>}
+      </div>
+
       {answer && (
-        <div style={{ marginTop: 12 }}>
-          <h3>Answer</h3>
+        <div className="card">
+          <h3 style={{ marginTop: 0 }}>Answer</h3>
           <div style={{ whiteSpace: 'pre-wrap' }}>{answer}</div>
         </div>
       )}
       {contexts.length > 0 && (
-        <div style={{ marginTop: 12 }}>
-          <h3>Sources</h3>
+        <div className="card">
+          <h3 style={{ marginTop: 0 }}>Sources</h3>
           <ul>
             {contexts.map((c, i) => (
               <li key={i}>
                 <strong>{c.file_name}</strong> (score {c.score.toFixed(2)})
-                <div style={{ fontSize: 12, color: '#555' }}>{c.preview}</div>
+                <div className="muted" style={{ fontSize: 12 }}>{c.preview}</div>
               </li>
             ))}
           </ul>

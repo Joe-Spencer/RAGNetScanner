@@ -135,54 +135,59 @@ export default function DocumentsPage() {
   }
 
   return (
-    <div>
-      <h2>Database</h2>
-      <form onSubmit={onSearch} style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
-        <input placeholder="Search name, description, project, contractor" value={query} onChange={(e) => setQuery(e.target.value)} style={{ flex: 1 }} />
-        <button type="submit">Search</button>
-      </form>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
-        <button onClick={exportDb} disabled={busy}>Export</button>
-        <label style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-          <input type="file" accept="application/json" onChange={(e) => importDbFromFile(e.target.files?.[0])} disabled={busy || importing} />
-          <span>{importing ? 'Importing…' : 'Import JSON'}</span>
-        </label>
-        <button onClick={clearDb} disabled={busy} style={{ color: 'white', background: '#c0392b', borderColor: '#c0392b' }}>Clear All</button>
-        <button onClick={exportCsv} disabled={busy}>Export CSV</button>
+    <div className="grid" style={{ gap: 16 }}>
+      <div className="card">
+        <h2 className="title">Database</h2>
+        <div className="toolbar" style={{ marginTop: 8 }}>
+          <form onSubmit={onSearch} className="toolbar" style={{ flex: 1 }}>
+            <input placeholder="Search name, description, project, contractor" value={query} onChange={(e) => setQuery(e.target.value)} />
+            <button type="submit" className="secondary">Search</button>
+          </form>
+          <button onClick={exportDb} disabled={busy} className="secondary">Export</button>
+          <label className="secondary" style={{ display: 'inline-flex', gap: 6, alignItems: 'center', padding: '8px 12px', borderRadius: 10 }}>
+            <input type="file" accept="application/json" onChange={(e) => importDbFromFile(e.target.files?.[0])} disabled={busy || importing} />
+            <span>{importing ? 'Importing…' : 'Import JSON'}</span>
+          </label>
+          <button onClick={exportCsv} disabled={busy} className="secondary">Export CSV</button>
+          <button onClick={clearDb} disabled={busy} className="danger">Clear All</button>
+        </div>
+        {loading && <div className="muted" style={{ marginTop: 8 }}>Loading…</div>}
+        {error && <div style={{color:'salmon', marginTop: 8}}>{error}</div>}
       </div>
-      {loading && <div>Loading...</div>}
-      {error && <div style={{color:'red'}}>{error}</div>}
-      <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Type</th>
-            <th>Project</th>
-            <th>Contractor</th>
-            <th>Modified</th>
-            <th>Size</th>
-          </tr>
-        </thead>
-        <tbody>
-          {docs.map(d => (
-            <tr key={d.id}>
-              <td title={d.file_path}>
-                {d.file_name}
-                <div>
-                  <button onClick={() => copyPath(d.file_path)} style={{ fontSize: 12 }}>Copy Path</button>
-                </div>
-              </td>
-              <td style={{maxWidth: 500}}>{d.description}</td>
-              <td>{d.file_type}</td>
-              <td>{d.project}</td>
-              <td>{d.contractor}</td>
-              <td>{d.modified_at}</td>
-              <td>{d.size_bytes}</td>
+
+      <div className="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Project</th>
+              <th>Contractor</th>
+              <th>Modified</th>
+              <th>Size</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {docs.map(d => (
+              <tr key={d.id}>
+                <td title={d.file_path}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                    <span>{d.file_name}</span>
+                    <button onClick={() => copyPath(d.file_path)} className="secondary" style={{ padding: '6px 8px' }}>Copy Path</button>
+                  </div>
+                </td>
+                <td style={{maxWidth: 500}}>{d.description}</td>
+                <td>{d.file_type}</td>
+                <td>{d.project}</td>
+                <td>{d.contractor}</td>
+                <td>{d.modified_at}</td>
+                <td>{d.size_bytes?.toLocaleString?.() ?? d.size_bytes}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

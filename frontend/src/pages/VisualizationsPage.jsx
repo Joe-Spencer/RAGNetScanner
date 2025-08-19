@@ -168,39 +168,21 @@ export default function VisualizationsPage() {
   }, [docs])
 
   return (
-    <div>
-      <h2>Database Visualizations</h2>
-      {loading && <div>Loading…</div>}
-      {error && <div style={{ color: 'red' }}>{error}</div>}
-      <div style={{ margin: '8px 0', color: '#555' }}>
-        <strong>Total size:</strong> {humanSize(totalSize)} ({totalSize.toLocaleString()} bytes) · <strong>Total files:</strong> {docs.length}
+    <div className="grid" style={{ gap: 16 }}>
+      <div className="card">
+        <h2 className="title">Database Visualizations</h2>
+        {loading && <div className="muted">Loading…</div>}
+        {error && <div style={{ color: 'salmon' }}>{error}</div>}
+        <div className="muted" style={{ marginTop: 6 }}>
+          <strong>Total size:</strong> {humanSize(totalSize)} ({totalSize.toLocaleString()} bytes) · <strong>Total files:</strong> {docs.length}
+        </div>
       </div>
-
-      <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
-        <div style={{ padding: 12, border: '1px solid #ddd', borderRadius: 8 }}>
-          <h3 style={{ marginTop: 0 }}>File Types by Size</h3>
-          <Pie data={fileTypePie} />
-        </div>
-
-        <div style={{ padding: 12, border: '1px solid #ddd', borderRadius: 8 }}>
-          <h3 style={{ marginTop: 0 }}>Top 5 Projects (by size)</h3>
-          <Bar data={topProjectsBar} options={{ plugins: { legend: { display: false } } }} />
-        </div>
-
-        <div style={{ padding: 12, border: '1px solid #ddd', borderRadius: 8 }}>
-          <h3 style={{ marginTop: 0 }}>Top 5 Contractors (by size)</h3>
-          <Bar data={topContractorsBar} options={{ plugins: { legend: { display: false } } }} />
-        </div>
-
-        <div style={{ padding: 12, border: '1px solid #ddd', borderRadius: 8 }}>
-          <h3 style={{ marginTop: 0 }}>Top 5 Descriptive Words</h3>
-          <Bar data={topWordsBar} options={{ plugins: { legend: { display: false } } }} />
-        </div>
-
-        <div style={{ padding: 12, border: '1px solid #ddd', borderRadius: 8 }}>
-          <h3 style={{ marginTop: 0 }}>Files Modified Timeline</h3>
-          <Bar data={modifiedTimeline} options={{ plugins: { legend: { display: false } } }} />
-        </div>
+      <div className="grid grid-3">
+        <div className="card"><h3 style={{ marginTop: 0 }}>File Types by Size</h3><Pie data={fileTypePie} /></div>
+        <div className="card"><h3 style={{ marginTop: 0 }}>Top 5 Projects (by size)</h3><Bar data={topProjectsBar} options={{ plugins: { legend: { display: false } } }} /></div>
+        <div className="card"><h3 style={{ marginTop: 0 }}>Top 5 Contractors (by size)</h3><Bar data={topContractorsBar} options={{ plugins: { legend: { display: false } } }} /></div>
+        <div className="card"><h3 style={{ marginTop: 0 }}>Top 5 Descriptive Words</h3><Bar data={topWordsBar} options={{ plugins: { legend: { display: false } } }} /></div>
+        <div className="card"><h3 style={{ marginTop: 0 }}>Files Modified Timeline</h3><Bar data={modifiedTimeline} options={{ plugins: { legend: { display: false } } }} /></div>
       </div>
     </div>
   )
