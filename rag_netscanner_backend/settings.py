@@ -24,12 +24,15 @@ load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-agvnvf6ogs-0(i=sh6@mkv@p34&v^^$ow=xe2!g%we#*w=g)2d'
+# Prefer environment variable; fall back to a static value for local dev only
+SECRET_KEY = os.getenv('SECRET_KEY', 'dev-insecure-key-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'true').lower() in {'1', 'true', 'yes'}
 
-ALLOWED_HOSTS = ["*"]
+# Comma-separated list in env; default to * for local dev
+_allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '*')
+ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(',') if h.strip()] or ["*"]
 
 
 # Application definition
@@ -125,7 +128,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 # CORS
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'true').lower() in {'1','true','yes'}
+_cors_origins = os.getenv('CORS_ALLOWED_ORIGINS')
+if _cors_origins:
+    CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors_origins.split(',') if o.strip()]
 
 # OpenAI
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
@@ -138,3 +144,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Scan controls (to avoid huge or noisy inputs). Tunable via env.
+# Max single file size to read (in bytes). Default 10 MiB.
+SCAN_MAX_BYTES = int(os.getenv('SCAN_MAX_BYTES', '10485760'))
+# Max number of chunks stored per file (to cap token usage). Default 64.
+SCAN_MAX_CHUNKS = int(os.getenv('SCAN_MAX_CHUNKS', '64'))
+# Comma-separated directory names to ignore while scanning
+SCAN_IGNORE_DIRS = {d.strip() for d in os.getenv('SCAN_IGNORE_DIRS', 'node_modules,.git,.venv,__pycache__,dist,build,.next,.idea,.vscode').split(',') if d.strip()}

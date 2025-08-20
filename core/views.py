@@ -35,10 +35,20 @@ def _read_text_from_file(path: str) -> str:
 
     try:
         if mime.startswith("text/"):
+            try:
+                if os.path.getsize(path) > getattr(settings, 'SCAN_MAX_BYTES', 10 * 1024 * 1024):
+                    return ""
+            except Exception:
+                pass
             with open(path, "r", encoding="utf-8", errors="ignore") as f:
                 return f.read()
         if mime == "application/pdf" or path.lower().endswith(".pdf"):
             text = []
+            try:
+                if os.path.getsize(path) > getattr(settings, 'SCAN_MAX_BYTES', 10 * 1024 * 1024):
+                    return ""
+            except Exception:
+                pass
             reader = PdfReader(path)
             for page in reader.pages:
                 text.append(page.extract_text() or "")
@@ -167,8 +177,11 @@ def scan_directory(request: HttpRequest):
     new_chunks = 0
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 
+    ignore_dirs = set(getattr(settings, 'SCAN_IGNORE_DIRS', set()))
     with transaction.atomic():
-        for root, _, files in os.walk(directory):
+        for root, dirs, files in os.walk(directory):
+            # Prune ignored directories in-place for efficiency
+            dirs[:] = [d for d in dirs if d not in ignore_dirs]
             for fname in files:
                 path = os.path.join(root, fname)
 
@@ -205,15 +218,25 @@ def scan_directory(request: HttpRequest):
                 text = _read_text_from_file(path)
                 if text:
                     chunks = text_splitter.split_text(text)
+                    max_chunks = int(getattr(settings, 'SCAN_MAX_CHUNKS', 64) or 64)
+                    if len(chunks) > max_chunks:
+                        chunks = chunks[:max_chunks]
                     if chunks:
-                        embeddings = _embed_texts(client, chunks)
+                        try:
+                            embeddings = _embed_texts(client, chunks)
+                        except Exception:
+                            embeddings = [[] for _ in chunks]
                         DocumentChunk.objects.filter(document=doc).delete()
                         for idx, (chunk, vec) in enumerate(zip(chunks, embeddings)):
+                            try:
+                                emb_bytes = _bytes_from_vector(vec) if vec else b""
+                            except Exception:
+                                emb_bytes = b""
                             DocumentChunk.objects.create(
                                 document=doc,
                                 chunk_index=idx,
                                 text=chunk,
-                                embedding=_bytes_from_vector(vec),
+                                embedding=emb_bytes,
                             )
                             new_chunks += 1
 

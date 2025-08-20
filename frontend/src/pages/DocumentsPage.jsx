@@ -103,6 +103,14 @@ export default function DocumentsPage() {
     try { await navigator.clipboard.writeText(path) } catch {}
   }
 
+  const openFile = async (path) => {
+    try {
+      await axios.post('/api/open/', { file_path: path })
+    } catch (e) {
+      setError(e?.response?.data?.error || e.message)
+    }
+  }
+
   const toCsv = (rows) => {
     const header = ['Name','Description','Type','Project','Contractor','Modified','Size','Path']
     const escape = (s) => '"' + String(s ?? '').replaceAll('"','""') + '"'
@@ -174,7 +182,10 @@ export default function DocumentsPage() {
                 <td title={d.file_path}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                     <span>{d.file_name}</span>
-                    <button onClick={() => copyPath(d.file_path)} className="secondary" style={{ padding: '6px 8px' }}>Copy Path</button>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button onClick={() => copyPath(d.file_path)} className="secondary" style={{ padding: '6px 8px' }}>Copy Path</button>
+                      <button onClick={() => openFile(d.file_path)} className="secondary" style={{ padding: '6px 8px' }}>Open</button>
+                    </div>
                   </div>
                 </td>
                 <td style={{maxWidth: 500}}>{d.description}</td>

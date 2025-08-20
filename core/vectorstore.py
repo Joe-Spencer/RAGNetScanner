@@ -46,10 +46,19 @@ def rebuild_index_from_db() -> bool:
         return False
     embeddings = []
     ids = []
+    target_dim = None
     for ch in chunks:
         vec = np.frombuffer(ch.embedding, dtype=np.float32)
+        if vec.size == 0:
+            continue
+        if target_dim is None:
+            target_dim = int(vec.size)
+        if int(vec.size) != target_dim:
+            continue
         embeddings.append(vec)
         ids.append(ch.id)
+    if not embeddings:
+        return False
     matrix = np.stack(embeddings, axis=0)
     d = matrix.shape[1]
     matrix = _normalize_matrix(matrix.astype(np.float32))
